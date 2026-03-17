@@ -67,14 +67,10 @@ task prep_tables {
     
     CODE 
     # iterate through file created earlier to grab the uri for each read file
-    #while read -r line; do
-    #  echo "running \`gsutil -m cp ${line} ~{gcp_bucket_uri}\`"
-    #  gsutil -m cp -n ${line} ~{gcp_bucket_uri}
-    # done < filepaths.tsv
 
   >>>
   output {
-    #File biosample_table = "microbe_~{timestamp}.tsv"
+
     File sra_table = "sra_meta_~{timestamp}.tsv"
   }
 
