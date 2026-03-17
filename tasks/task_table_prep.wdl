@@ -65,10 +65,14 @@ task prep_tables {
     # 
     sra_meta.to_csv("sra_meta_~{timestamp}.tsv", sep='\t', index=False)
     
-    CODE 
+    CODE
     # iterate through file created earlier to grab the uri for each read file
+    while read -r line; do
+      echo "running \`gsutil -m cp ${line} ~{gcp_bucket_uri}\`"  
+    done < filepaths.tsv
 
   >>>
+
   output {
 
     File sra_table = "sra_meta_~{timestamp}.tsv"
