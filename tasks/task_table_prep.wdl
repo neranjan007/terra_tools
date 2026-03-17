@@ -8,8 +8,8 @@ task prep_tables {
     Array[String] sample_names
     String bioproject
     String gcp_bucket_uri
-    #String submission_id_column_name
-    #String organism_column_name
+    String submission_id_column_name
+    String organism_column_name
     String timestamp
     String? library_strategy = "WGS"
     String? library_source = "GENOMIC"
@@ -39,6 +39,8 @@ task prep_tables {
 
     # # prep Microbe 1.0
 
+    table2 = table.set_index("~{table_name}_id")
+    table2 = table2.rename(columns={"~{submission_id_column_name}":"*sample_name","~{organism_column_name}":"*organism","collection_date":"*collection_date"})
    
     # prep sra_metadata
     sra_meta = pd.DataFrame(columns=["~{table_name}_id", "sample_name", "library_ID", "title", "library_strategy", "library_source", "library_selection", "library_layout", "platform", "instrument_model", "design_description", "filetype", "filename", "filename2"])
@@ -60,10 +62,15 @@ task prep_tables {
     table["read2"].to_csv("filepaths.tsv", mode='a', index=False, header=False)
 
     # write tables into files
-
+    # 
     sra_meta.to_csv("sra_meta_~{timestamp}.tsv", sep='\t', index=False)
-
-
+    
+    CODE 
+    # iterate through file created earlier to grab the uri for each read file
+    #while read -r line; do
+    #  echo "running \`gsutil -m cp ${line} ~{gcp_bucket_uri}\`"
+    #  gsutil -m cp -n ${line} ~{gcp_bucket_uri}
+    # done < filepaths.tsv
 
   >>>
   output {
