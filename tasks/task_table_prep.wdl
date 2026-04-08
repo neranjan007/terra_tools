@@ -37,15 +37,37 @@ task prep_tables {
     # selected samples only
     table = table[table["~{table_name}_id"].isin("~{sep='*' sample_names}".split("*"))]
 
-    # # prep Microbe 1.0
+    # # prep One Health Enteric
+    onehealth = pd.DataFrame(columns=["~{table_name}_id","*sample_name", "*bioproject_accession", "strain",\
+    "*organism", "collected_by", "collection_date", "*geo_loc_name", "*isolation_source", "*source_type",\
+    "*purpose_of_sampling", "*project_name", "*sequenced_by", "food_origin", "label_claims"])
 
+    onehealth["~{table_name}_id"] = table["~{table_name}_id"]
+    onehealth = onehealth.set_index("~{table_name}_id")
+
+    #This step prepares your original Terra data to be merged into the NCBI onehealth 1.0 template by aligning the column names
     table2 = table.set_index("~{table_name}_id")
-    table2 = table2.rename(columns={"~{submission_id_column_name}":"*sample_name","~{organism_column_name}":"*organism","collection_date":"*collection_date"})
+    #Renaming Columns to NCBI Standards
+    table2 = table2.rename(columns={"~{submission_id_column_name}":"*sample_name","~{organism_column_name}":"*organism",\
+    "CollectionDate":"*collection_date", "~{submission_strain_name}":"strain",\
+    "Geo_loc_name":"*geo_loc_name", "SourceSite":"isolation_source","SourceType":"source_type", "Purpose_of_sampling":"purpose_of_sampling",\
+    "Food_origin":"food_origin", "label_claims":"label_claims"})
    
+    #direct data transfer from your source table (table2) into the empty NCBI template (onehealth)
+    onehealth.loc[:, ["*sample_name","*organism","*strain","collection_date","*geo_loc_name","*isolation_source", "*source_type","*purpose_of_sampling","food_origin", "label_claims"]] = table2[["*sample_name","*organism","*strain","collection_date","*geo_loc_name","*isolation_source", "*source_type","*purpose_of_sampling","food_origin", "label_claims"]]
+    #any required columns that were empty in the original file, it fills in default values.
+    onehealth.fillna({"bioproject_accession":"~{bioproject}", "collected_by":"~{CollectedBy}", "*project_name":"~{ProjectName}", "sequenced_by":"~{SequencedBy}"}, inplace=True)
+    #
+    #onehealth["strain"] = onehealth["*sample_name"]
+    ## Replace underscores with spaces, then keep only the first two words
+    onehealth["*organism"] = (onehealth["*organism"].str.replace("_", " ", regex=False).str.split(n=2).str[:2].str.join(" "))
+
     # prep sra_metadata
     sra_meta = pd.DataFrame(columns=["~{table_name}_id", "sample_name", "library_ID", "title", "library_strategy", "library_source", "library_selection", "library_layout", "platform", "instrument_model", "design_description", "filetype", "filename", "filename2"])
     sra_meta["~{table_name}_id"] = table["~{table_name}_id"] 
     sra_meta = sra_meta.set_index("~{table_name}_id")
+
+    
 
     table2["read1"] = table2["read1"].map(lambda filename: filename.split('/').pop())
     table2["read2"] = table2["read2"].map(lambda filename: filename.split('/').pop())
@@ -63,6 +85,7 @@ task prep_tables {
 
     # write tables into files
     # 
+    onehealth.to_csv("microbe_~{timestamp}.tsv", sep='\t', float_format='%.0f', index=False)
     sra_meta.to_csv("sra_meta_~{timestamp}.tsv", sep='\t', index=False)
     
     CODE
