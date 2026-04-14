@@ -9,7 +9,6 @@ task prep_tables {
     String bioproject
     String gcp_bucket_uri
     String submission_id_column_name
-    String submission_strain_name
     String organism_column_name
     String timestamp
     String? CollectedBy = "Connecticut Department of Public Health"
@@ -52,7 +51,7 @@ task prep_tables {
     table2 = table.set_index("~{table_name}_id")
     #Renaming Columns to NCBI Standards
     table2 = table2.rename(columns={"~{submission_id_column_name}":"*sample_name","~{organism_column_name}":"*organism",\
-    "CollectionDate":"*collection_date", "~{submission_strain_name}":"strain",\
+    "CollectionDate":"*collection_date", "~{submission_id_column_name}":"strain",\
     "Geo_loc_name":"*geo_loc_name", "SourceSite":"isolation_source","SourceType":"source_type", "Purpose_of_sampling":"purpose_of_sampling",\
     "Food_origin":"food_origin", "label_claims":"label_claims"})
    
