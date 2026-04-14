@@ -21,6 +21,7 @@ workflow sra_prep {
     String? instrument_model
     String? design_description
     String? filetype
+    String? ProjectName
   }
 
   call version.version_capture {
