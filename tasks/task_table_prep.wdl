@@ -21,7 +21,7 @@ task prep_tables {
     String? instrument_model = "MiSeq i100"
     String? design_description = "Paired-end 2x150 reads"
     String? filetype = "fastq"
-    String? ProjectName ="PRJNA800017"
+    String? ProjectName = "PRJNA800017"
 
 
   }
