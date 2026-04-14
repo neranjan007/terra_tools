@@ -9,6 +9,7 @@ task prep_tables {
     String bioproject
     String gcp_bucket_uri
     String submission_id_column_name
+    String submission_strain_name
     String organism_column_name
     String timestamp
     String? CollectedBy = "Connecticut Department of Public Health"
