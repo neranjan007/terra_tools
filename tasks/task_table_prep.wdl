@@ -11,6 +11,8 @@ task prep_tables {
     String submission_id_column_name
     String organism_column_name
     String timestamp
+    String? CollectedBy = "Connecticut Department of Public Health"
+    String? SequencedBy = "Connecticut Department of Public Health"
     String? library_strategy = "WGS"
     String? library_source = "GENOMIC"
     String? library_selection = "RANDOM"
@@ -56,7 +58,8 @@ task prep_tables {
     #direct data transfer from your source table (table2) into the empty NCBI template (onehealth)
     onehealth.loc[:, ["*sample_name","*organism","*strain","collection_date","*geo_loc_name","*isolation_source", "*source_type","*purpose_of_sampling","food_origin", "label_claims"]] = table2[["*sample_name","*organism","*strain","collection_date","*geo_loc_name","*isolation_source", "*source_type","*purpose_of_sampling","food_origin", "label_claims"]]
     #any required columns that were empty in the original file, it fills in default values.
-    onehealth.fillna({"bioproject_accession":"~{bioproject}", "collected_by":"~{CollectedBy}", "*project_name":"~{ProjectName}", "sequenced_by":"~{SequencedBy}"}, inplace=True)
+    onehealth.fillna({"bioproject_accession":"~{bioproject}", "collected_by":"~{CollectedBy}", "*project_name":"~{ProjectName}", \
+    "sequenced_by":"~{SequencedBy}"}, inplace=True)
     #
     #onehealth["strain"] = onehealth["*sample_name"]
     ## Replace underscores with spaces, then keep only the first two words
@@ -99,6 +102,7 @@ task prep_tables {
   output {
 
     File sra_table = "sra_meta_~{timestamp}.tsv"
+    File biosample_table = "microbe_~{timestamp}.tsv"
   }
 
   runtime {

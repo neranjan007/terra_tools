@@ -11,6 +11,8 @@ workflow sra_prep {
     Array[String] sample_names
     String sra_transfer_gcp_bucket # used to be gcp_bucket_uri
     String bioproject
+    String? CollectedBy
+    String? SequencedBy
     String? library_strategy
     String? library_source
     String? library_selection
@@ -47,6 +49,7 @@ workflow sra_prep {
   output {
     #File biosample_metadata = prep_tables.biosample_table
     File sra_metadata = prep_tables.sra_table
+    File biosample_metadata = prep_tables.biosample_table
     String sra_prep_version = "v0.8"
   }
 }
