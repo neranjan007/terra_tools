@@ -9,7 +9,9 @@ task prep_tables {
     String bioproject
     String CollectedBy
     String SequencedBy
-    String narms_project_name
+    String? narms_project_name = "NARMS Retail Meat"
+    String? SequencedBy = "CT"
+    String? CollectedBy = "CT"
     String gcp_bucket_uri
     String submission_id_column_name
     String organism_column_name
