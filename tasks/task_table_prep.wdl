@@ -105,7 +105,7 @@ task prep_tables {
   output {
 
     File sra_table = "sra_meta_~{timestamp}.tsv"
-    File microb_table = "microbe_~{timestamp}.tsv"
+    File biosample_table = "microbe_~{timestamp}.tsv"
   }
 
   runtime {
