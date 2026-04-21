@@ -21,7 +21,7 @@ workflow sra_prep {
     String? instrument_model
     String? design_description
     String? filetype
-    String? ProjectName
+    String? NARMS_project_name
   }
 
   call version.version_capture {
@@ -45,6 +45,9 @@ workflow sra_prep {
       instrument_model = instrument_model,
       design_description = design_description,
       filetype = filetype
+      NARMS_project_name = NARMS_project_name
+      SequencedBy = SequencedBy
+      CollectedBy = CollectedBy
   }
 
   output {

@@ -7,6 +7,9 @@ task prep_tables {
     String project_name
     Array[String] sample_names
     String bioproject
+    String CollectedBy
+    String SequencedBy
+    String NARMS_project_name
     String gcp_bucket_uri
     String submission_id_column_name
     String organism_column_name
@@ -50,25 +53,68 @@ task prep_tables {
     "samp_size","serotype","serovar","specimen_voucher",\
     "temp","description","MLST","scheme"])
 
+    onehealth = pd.DataFrame(columns=["~{table_name}_id",\
+    "*sample_name",\
+    "bioproject_accession",\
+    "isolate_name_alias",\
+    "strain",\
+    "culture_collection",\
+    "reference_material",\
+    "organism",\
+    "collected_by",\
+    "collection_date",\
+    "cult_isol_date",\
+    "geo_loc_name",\
+    "isolation_source",\
+    "source_type",\
+    "samp_collect_device",\
+    "purpose_of_sampling",\
+    "project_name",\
+    "IFSAC_category",\
+    "lat_lon",\
+    "serotype",\
+    "serovar",\
+    "sequenced_by",\
+    "description",\
+    "food_origin",\
+    "intended_consumer",\
+    "spec_intended_cons",\
+    "coll_site_geo_feat",\
+    "food_prod",\
+    "label_claims",\
+    "food_product_type",\
+    "food_industry_code",\
+    "food_industry_class",\
+    "food_source",\
+    "food_processing_method"])
+
     microbe["~{table_name}_id"] = table["~{table_name}_id"]
     microbe = microbe.set_index("~{table_name}_id")
+    onehealth["~{table_name}_id"] = table["~{table_name}_id"]
+    onehealth = onehealth.set_index("~{table_name}_id")
 
     table2 = table.set_index("~{table_name}_id")
-    table2 = table2.rename(columns={"~{submission_id_column_name}":"*sample_name","~{organism_column_name}":"*organism","collection_date":"*collection_date"})
+    table2 = table2.rename(columns={"~{submission_id_column_name}":"*sample_name","~{organism_column_name}":"*organism"})
    
-    microbe.loc[:, ["*sample_name","*organism","isolation_source","*collection_date","MLST","scheme"]] = table2[["*sample_name","*organism","isolation_source","*collection_date","MLST","scheme"]]
+    microbe.loc[:, ["*sample_name","*organism"]] = table2[["*sample_name","*organism"]]
+    onehealth.loc[:, ["*sample_name","*organism"]] = table2[["*sample_name","*organism"]]
+    
     microbe.fillna({"bioproject_accession":"~{bioproject}", "host":"Homo sapiens", "*geo_loc_name":"USA", "*sample_type":"whole organism"}, inplace=True)
+    onehealth.fillna({"bioproject_accession":"~{bioproject}", "collected_by":"~{CollectedBy}", "project_name":"~{NARMS_project_name}", "sequenced_by":"~{SequencedBy}"}, inplace=True)
+    
     microbe["isolate"] = microbe["*sample_name"]
     microbe["*organism"] = microbe["*organism"].str.split(n=2).str[:2].str.join(" ")
+    onehealth["strain"] = onehealth["*sample_name"]
+
     ### Replace underscores with spaces, then keep only the first two words
     ## onehealth["*organism"] = (onehealth["*organism"].str.replace("_", " ", regex=False).str.split(n=2).str[:2].str.join(" "))
     # fix mslt schemes
-    microbe.loc[microbe["scheme"] == "ecoli", "scheme"] = "Pasteur"
-    microbe.loc[microbe["scheme"] == "ecoli_achtman_4", "scheme"] = "Achtman"
-    microbe.loc[microbe["scheme"] == "abaumannii", "scheme"] = "Oxford"
-    microbe.loc[microbe["scheme"] == "abaumannii_2", "scheme"] = "Pasteur"
-    microbe["MLST"] = np.where(microbe["MLST"] != "No ST predicted", "ML" + microbe["MLST"].astype(str) +  "_" + microbe["scheme"], '')
-    microbe.drop(columns=["scheme"], inplace=True)
+    # microbe.loc[microbe["scheme"] == "ecoli", "scheme"] = "Pasteur"
+    # microbe.loc[microbe["scheme"] == "ecoli_achtman_4", "scheme"] = "Achtman"
+    #microbe.loc[microbe["scheme"] == "abaumannii", "scheme"] = "Oxford"
+    #microbe.loc[microbe["scheme"] == "abaumannii_2", "scheme"] = "Pasteur"
+    #microbe["MLST"] = np.where(microbe["MLST"] != "No ST predicted", "ML" + microbe["MLST"].astype(str) +  "_" + microbe["scheme"], '')
+    #microbe.drop(columns=["scheme"], inplace=True)
 
     # prep sra_metadata
     sra_meta = pd.DataFrame(columns=["~{table_name}_id", "sample_name", "library_ID", "title", "library_strategy", "library_source", "library_selection", "library_layout", "platform", "instrument_model", "design_description", "filetype", "filename", "filename2"])
@@ -93,6 +139,7 @@ task prep_tables {
     # 
     sra_meta.to_csv("sra_meta_~{timestamp}.tsv", sep='\t', index=False)
     microbe.to_csv("microbe_~{timestamp}.tsv", sep='\t', index=False)
+    onehealth.to_csv("onehealth_~{timestamp}.tsv", sep='\t', index=False)
 
     CODE
     # iterate through file created earlier to grab the uri for each read file
@@ -105,7 +152,8 @@ task prep_tables {
   output {
 
     File sra_table = "sra_meta_~{timestamp}.tsv"
-    File biosample_table = "microbe_~{timestamp}.tsv"
+    File biosample_table = "onehealth_~{timestamp}.tsv"
+
   }
 
   runtime {
