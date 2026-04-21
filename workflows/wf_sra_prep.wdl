@@ -44,9 +44,9 @@ workflow sra_prep {
       platform = platform,
       instrument_model = instrument_model,
       design_description = design_description,
-      filetype = filetype
-      narms_project_name = narms_project_name
-      SequencedBy = SequencedBy
+      filetype = filetype,
+      narms_project_name = narms_project_name,
+      SequencedBy = SequencedBy,
       CollectedBy = CollectedBy
   }
 
