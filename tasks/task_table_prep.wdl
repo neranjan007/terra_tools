@@ -11,8 +11,6 @@ task prep_tables {
     String submission_id_column_name
     String organism_column_name
     String timestamp
-    String? CollectedBy = "Connecticut Department of Public Health"
-    String? SequencedBy = "Connecticut Department of Public Health"
     String? library_strategy = "WGS"
     String? library_source = "GENOMIC"
     String? library_selection = "RANDOM"
@@ -21,7 +19,6 @@ task prep_tables {
     String? instrument_model = "MiSeq i100"
     String? design_description = "Paired-end 2x150 reads"
     String? filetype = "fastq"
-    String? ProjectName = "PRJNA800017"
 
 
   }
@@ -40,38 +37,43 @@ task prep_tables {
     # selected samples only
     table = table[table["~{table_name}_id"].isin("~{sep='*' sample_names}".split("*"))]
 
-    # # prep One Health Enteric
-    onehealth = pd.DataFrame(columns=["~{table_name}_id","*sample_name", "*bioproject_accession", "strain",\
-    "*organism", "collected_by", "collection_date", "*geo_loc_name", "*isolation_source", "*source_type",\
-    "*purpose_of_sampling", "*project_name", "*sequenced_by", "food_origin", "label_claims"])
+    # # prep Microbe 1.0
+    microbe = pd.DataFrame(columns=["~{table_name}_id",\
+    "*sample_name",\
+    "sample_title",\
+    "bioproject_accession",\
+    "*organism", "strain",\
+    "isolate","host","isolation_source","*collection_date",\
+    "*geo_loc_name","*sample_type","altitude","biomaterial_provider",\
+    "collected_by","culture_collection","depth","env_broad_scale","genotype",\
+    "host_tissue_sampled","identified_by","lab_host","lat_lon","mating_type","passage_history",\
+    "samp_size","serotype","serovar","specimen_voucher",\
+    "temp","description","MLST","scheme"])
 
-    onehealth["~{table_name}_id"] = table["~{table_name}_id"]
-    onehealth = onehealth.set_index("~{table_name}_id")
+    microbe["~{table_name}_id"] = table["~{table_name}_id"]
+    microbe = microbe.set_index("~{table_name}_id")
 
-    #This step prepares your original Terra data to be merged into the NCBI onehealth 1.0 template by aligning the column names
     table2 = table.set_index("~{table_name}_id")
-    #Renaming Columns to NCBI Standards
-    table2 = table2.rename(columns={"~{submission_id_column_name}":"*sample_name","~{organism_column_name}":"*organism",\
-    "CollectionDate":"*collection_date", "~{submission_id_column_name}":"strain",\
-    "Geo_loc_name":"*geo_loc_name", "SourceSite":"isolation_source","SourceType":"source_type", "Purpose_of_sampling":"purpose_of_sampling",\
-    "Food_origin":"food_origin", "label_claims":"label_claims"})
+    table2 = table2.rename(columns={"~{submission_id_column_name}":"*sample_name","~{organism_column_name}":"*organism","collection_date":"*collection_date"})
    
-    #direct data transfer from your source table (table2) into the empty NCBI template (onehealth)
-    onehealth.loc[:, ["*sample_name","*organism","*strain","collection_date","*geo_loc_name","*isolation_source", "*source_type","*purpose_of_sampling","food_origin", "label_claims"]] = table2[["*sample_name","*organism","*strain","collection_date","*geo_loc_name","*isolation_source", "*source_type","*purpose_of_sampling","food_origin", "label_claims"]]
-    #any required columns that were empty in the original file, it fills in default values.
-    onehealth.fillna({"bioproject_accession":"~{bioproject}", "collected_by":"~{CollectedBy}", "*project_name":"~{ProjectName}", \
-    "sequenced_by":"~{SequencedBy}"}, inplace=True)
-    #
-    #onehealth["strain"] = onehealth["*sample_name"]
-    ## Replace underscores with spaces, then keep only the first two words
-    onehealth["*organism"] = (onehealth["*organism"].str.replace("_", " ", regex=False).str.split(n=2).str[:2].str.join(" "))
+    microbe.loc[:, ["*sample_name","*organism","isolation_source","*collection_date","MLST","scheme"]] = table2[["*sample_name","*organism","isolation_source","*collection_date","MLST","scheme"]]
+    microbe.fillna({"bioproject_accession":"~{bioproject}", "host":"Homo sapiens", "*geo_loc_name":"USA", "*sample_type":"whole organism"}, inplace=True)
+    microbe["isolate"] = microbe["*sample_name"]
+    microbe["*organism"] = microbe["*organism"].str.split(n=2).str[:2].str.join(" ")
+    ### Replace underscores with spaces, then keep only the first two words
+    ## onehealth["*organism"] = (onehealth["*organism"].str.replace("_", " ", regex=False).str.split(n=2).str[:2].str.join(" "))
+    # fix mslt schemes
+    microbe.loc[microbe["scheme"] == "ecoli", "scheme"] = "Pasteur"
+    microbe.loc[microbe["scheme"] == "ecoli_achtman_4", "scheme"] = "Achtman"
+    microbe.loc[microbe["scheme"] == "abaumannii", "scheme"] = "Oxford"
+    microbe.loc[microbe["scheme"] == "abaumannii_2", "scheme"] = "Pasteur"
+    microbe["MLST"] = np.where(microbe["MLST"] != "No ST predicted", "ML" + microbe["MLST"].astype(str) +  "_" + microbe["scheme"], '')
+    microbe.drop(columns=["scheme"], inplace=True)
 
     # prep sra_metadata
     sra_meta = pd.DataFrame(columns=["~{table_name}_id", "sample_name", "library_ID", "title", "library_strategy", "library_source", "library_selection", "library_layout", "platform", "instrument_model", "design_description", "filetype", "filename", "filename2"])
     sra_meta["~{table_name}_id"] = table["~{table_name}_id"] 
     sra_meta = sra_meta.set_index("~{table_name}_id")
-
-    
 
     table2["read1"] = table2["read1"].map(lambda filename: filename.split('/').pop())
     table2["read2"] = table2["read2"].map(lambda filename: filename.split('/').pop())
@@ -89,9 +91,9 @@ task prep_tables {
 
     # write tables into files
     # 
-    onehealth.to_csv("microbe_~{timestamp}.tsv", sep='\t', float_format='%.0f', index=False)
     sra_meta.to_csv("sra_meta_~{timestamp}.tsv", sep='\t', index=False)
-    
+    microbe.to_csv("microbe_~{timestamp}.tsv", sep='\t', index=False)
+
     CODE
     # iterate through file created earlier to grab the uri for each read file
     while read -r line; do
@@ -103,7 +105,7 @@ task prep_tables {
   output {
 
     File sra_table = "sra_meta_~{timestamp}.tsv"
-    File biosample_table = "microbe_~{timestamp}.tsv"
+    File microb_table = "microbe_~{timestamp}.tsv"
   }
 
   runtime {
