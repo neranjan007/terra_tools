@@ -4,12 +4,12 @@ task prep_tables {
   input {
     String table_name
     String workspace_name
-    String project_name
+    String terra_project_name
     Array[String] sample_names
     String bioproject
     String CollectedBy
     String SequencedBy
-    String NARMS_project_name
+    String narms_project_name
     String gcp_bucket_uri
     String submission_id_column_name
     String organism_column_name
@@ -27,7 +27,7 @@ task prep_tables {
   }
   command <<<
     # download terra table
-    python3 /scripts/export_large_tsv/export_large_tsv.py --project "~{project_name}" --workspace "~{workspace_name}" --entity_type ~{table_name} --tsv_filename ~{table_name}-data.tsv
+    python3 /scripts/export_large_tsv/export_large_tsv.py --project "~{terra_project_name}" --workspace "~{workspace_name}" --entity_type ~{table_name} --tsv_filename ~{table_name}-data.tsv
     
     python3 <<CODE 
     import pandas as pd
@@ -100,7 +100,7 @@ task prep_tables {
     onehealth.loc[:, ["*sample_name","*organism"]] = table2[["*sample_name","*organism"]]
     
     microbe.fillna({"bioproject_accession":"~{bioproject}", "host":"Homo sapiens", "*geo_loc_name":"USA", "*sample_type":"whole organism"}, inplace=True)
-    onehealth.fillna({"bioproject_accession":"~{bioproject}", "collected_by":"~{CollectedBy}", "project_name":"~{NARMS_project_name}", "sequenced_by":"~{SequencedBy}"}, inplace=True)
+    onehealth.fillna({"bioproject_accession":"~{bioproject}", "collected_by":"~{CollectedBy}", "project_name":"~{narms_project_name}", "sequenced_by":"~{SequencedBy}"}, inplace=True)
     
     microbe["isolate"] = microbe["*sample_name"]
     microbe["*organism"] = microbe["*organism"].str.split(n=2).str[:2].str.join(" ")

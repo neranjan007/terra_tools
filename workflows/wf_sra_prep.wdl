@@ -5,7 +5,7 @@ import "../tasks/task_version.wdl" as version
 
 workflow sra_prep {
   input {
-    String project_name
+    String terra_project_name
     String workspace_name
     String table_name
     Array[String] sample_names
@@ -21,7 +21,7 @@ workflow sra_prep {
     String? instrument_model
     String? design_description
     String? filetype
-    String? NARMS_project_name
+    String? narms_project_name
   }
 
   call version.version_capture {
@@ -30,7 +30,7 @@ workflow sra_prep {
 
   call prep.prep_tables {
     input:
-      project_name = project_name,
+      terra_project_name = terra_project_name,
       workspace_name = workspace_name,
       table_name = table_name,
       sample_names = sample_names,
@@ -45,7 +45,7 @@ workflow sra_prep {
       instrument_model = instrument_model,
       design_description = design_description,
       filetype = filetype
-      NARMS_project_name = NARMS_project_name
+      narms_project_name = narms_project_name
       SequencedBy = SequencedBy
       CollectedBy = CollectedBy
   }
