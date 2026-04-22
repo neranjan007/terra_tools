@@ -134,8 +134,13 @@ task prep_tables {
                     "filetype":"~{filetype}"}, inplace=True)
 
     # generate a filepaths file for gsutil   
-    table["read1"].to_csv("filepaths.tsv", index=False, header=False)
-    table["read2"].to_csv("filepaths.tsv", mode='a', index=False, header=False)
+    # table["read1"].to_csv("filepaths.tsv", index=False, header=False)
+    # table["read2"].to_csv("filepaths.tsv", mode='a', index=False, header=False)
+    # generate a mapping file with filepaths and sample names for gsutil
+    mapping_data = pd.DataFrame()
+    mapping_data['filepath'] = pd.concat([table["read1"], table["read2"]], ignore_index=True)
+    mapping_data['sample_name'] = list(table2["sample_name"]) + list(table2["sample_name"])
+    mapping_data.to_csv("filepaths_mapping.tsv", sep='\t', index=False, header=False)
 
     # write tables into files
     # 
@@ -145,9 +150,13 @@ task prep_tables {
 
     CODE
     # iterate through file created earlier to grab the uri for each read file
-    while read -r line; do
-      echo "running \`gsutil -m cp ${line} ~{gcp_bucket_uri}/${sample_name}\`"  
-    done < filepaths.tsv
+    # while read -r line; do
+    #   echo "running \`gsutil -m cp ${line} ~{gcp_bucket_uri}/${sample_name}\`"  
+    # done < filepaths.tsv
+    while IFS=$'\t' read -r filepath sample_name; do
+      echo "running \`gsutil -m cp ${filepath} ~{gcp_bucket_uri}/${sample_name}/\`"  
+    done < filepaths_mapping.tsv
+
 
   >>>
 
