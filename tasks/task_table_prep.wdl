@@ -62,7 +62,7 @@ task prep_tables {
     "strain",\
     "culture_collection",\
     "reference_material",\
-    "organism",\
+    "*organism",\
     "collected_by",\
     "collection_date",\
     "cult_isol_date",\
@@ -99,7 +99,7 @@ task prep_tables {
     table2 = table2.rename(columns={"~{submission_id_column_name}":"*sample_name","~{organism_column_name}":"*organism"})
    
     microbe.loc[:, ["*sample_name","*organism"]] = table2[["*sample_name","*organism"]]
-    onehealth.loc[:, ["*sample_name","*organism"]] = table2[["*sample_name","*organism"]]
+    onehealth.loc[:, ["*sample_name","*organism","collection_date","geo_loc_name","isolation_source","source_type","purpose_of_sampling","food_origin","label_claims"]] = table2[["*sample_name","*organism","collection_date","geo_loc_name","isolation_source","source_type","purpose_of_sampling","food_origin","label_claims"]]
     
     microbe.fillna({"bioproject_accession":"~{bioproject}", "host":"Homo sapiens", "*geo_loc_name":"USA", "*sample_type":"whole organism"}, inplace=True)
     onehealth.fillna({"bioproject_accession":"~{bioproject}", "collected_by":"~{CollectedBy}", "project_name":"~{narms_project_name}", "sequenced_by":"~{SequencedBy}"}, inplace=True)
