@@ -154,7 +154,8 @@ task prep_tables {
     #   echo "running \`gsutil -m cp ${line} ~{gcp_bucket_uri}/${sample_name}\`"  
     # done < filepaths.tsv
     while IFS=$'\t' read -r filepath sample_name; do
-      echo "running \`gsutil -m cp ${filepath} ~{gcp_bucket_uri}/\`"  
+      echo "running \`gsutil -m cp ${filepath} ~{gcp_bucket_uri}/\`" 
+      gsutil -m cp ${filepath} ~{gcp_bucket_uri}/ 
     done < filepaths_mapping.tsv
 
 
