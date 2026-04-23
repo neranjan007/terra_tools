@@ -145,7 +145,7 @@ task prep_tables {
     # write tables into files
     # 
     sra_meta.to_csv("sra_meta_~{timestamp}.tsv", sep='\t', index=False)
-    microbe.to_csv("microbe_~{timestamp}.tsv", sep='\t', index=False)
+    #microbe.to_csv("microbe_~{timestamp}.tsv", sep='\t', index=False)
     onehealth.to_csv("onehealth_~{timestamp}.tsv", sep='\t', index=False)
 
     CODE
@@ -154,7 +154,7 @@ task prep_tables {
     #   echo "running \`gsutil -m cp ${line} ~{gcp_bucket_uri}/${sample_name}\`"  
     # done < filepaths.tsv
     while IFS=$'\t' read -r filepath sample_name; do
-      echo "running \`gsutil -m cp ${filepath} ~{gcp_bucket_uri}/${sample_name}/\`"  
+      echo "running \`gsutil -m cp ${filepath} ~{gcp_bucket_uri}/\`"  
     done < filepaths_mapping.tsv
 
 
