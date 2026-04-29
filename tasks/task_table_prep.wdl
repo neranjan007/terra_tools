@@ -166,8 +166,8 @@ task prep_tables {
 
   output {
 
-    File sra_table = "sra_meta_~{timestamp}.tsv"
-    File biosample_table = "onehealth_~{timestamp}.tsv"
+    File sra_table = "sra_meta_${timestamp}.tsv"
+    File biosample_table = "onehealth_${timestamp}.tsv"
 
   }
 
