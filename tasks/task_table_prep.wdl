@@ -94,18 +94,18 @@ task prep_tables {
     "food_source",\
     "food_processing_method"])
 
-    microbe["~{table_name}_id"] = table["~{table_name}_id"]
-    microbe = microbe.set_index("~{table_name}_id")
+    #microbe["~{table_name}_id"] = table["~{table_name}_id"]
+    #microbe = microbe.set_index("~{table_name}_id")
     onehealth["~{table_name}_id"] = table["~{table_name}_id"]
     onehealth = onehealth.set_index("~{table_name}_id")
 
     table2 = table.set_index("~{table_name}_id")
     table2 = table2.rename(columns={"~{submission_id_column_name}":"*sample_name","~{organism_column_name}":"*organism"})
    
-    microbe.loc[:, ["*sample_name","*organism"]] = table2[["*sample_name","*organism"]]
+    #microbe.loc[:, ["*sample_name","*organism"]] = table2[["*sample_name","*organism"]]
     onehealth.loc[:, ["*sample_name","*organism","collection_date","geo_loc_name","isolation_source","source_type","purpose_of_sampling","food_origin","label_claims"]] = table2[["*sample_name","*organism","collection_date","geo_loc_name","isolation_source","source_type","purpose_of_sampling","food_origin","label_claims"]]
     
-    microbe.fillna({"bioproject_accession":"~{bioproject}", "host":"Homo sapiens", "*geo_loc_name":"USA", "*sample_type":"whole organism"}, inplace=True)
+    #microbe.fillna({"bioproject_accession":"~{bioproject}", "host":"Homo sapiens", "*geo_loc_name":"USA", "*sample_type":"whole organism"}, inplace=True)
     onehealth.fillna({"bioproject_accession":"~{bioproject}", "collected_by":"~{CollectedBy}", "project_name":"~{narms_project_name}", "sequenced_by":"~{SequencedBy}"}, inplace=True)
     
     microbe["isolate"] = microbe["*sample_name"]
