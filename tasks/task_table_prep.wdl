@@ -26,11 +26,11 @@ task prep_tables {
     String? filetype = "fastq"
   }
 
-  String timestamp = $(date +"%Y%m%d_T%H%M%S")
+  
 
   command <<<
 
-    
+    timestamp = (date + "%Y%m%d_T%H%M%S")
 
     # download terra table
     python3 /scripts/export_large_tsv/export_large_tsv.py --project "~{terra_project_name}" --workspace "~{workspace_name}" --entity_type ~{table_name} --tsv_filename ~{table_name}-data.tsv
@@ -148,9 +148,9 @@ task prep_tables {
 
     # write tables into files
     # 
-    sra_meta.to_csv("sra_meta_~{timestamp}.tsv", sep='\t', index=False)
+    sra_meta.to_csv("sra_meta_${timestamp}.tsv", sep='\t', index=False)
     #microbe.to_csv("microbe_~{timestamp}.tsv", sep='\t', index=False)
-    onehealth.to_csv("onehealth_~{timestamp}.tsv", sep='\t', index=False)
+    onehealth.to_csv("onehealth_${timestamp}.tsv", sep='\t', index=False)
 
     CODE
     # iterate through file created earlier to grab the uri for each read file
@@ -167,8 +167,8 @@ task prep_tables {
 
   output {
 
-    File sra_table = "sra_meta_~{timestamp}.tsv"
-    File biosample_table = "onehealth_~{timestamp}.tsv"
+    File sra_table = "sra_meta_${timestamp}.tsv"
+    File biosample_table = "onehealth_${timestamp}.tsv"
 
   }
 
