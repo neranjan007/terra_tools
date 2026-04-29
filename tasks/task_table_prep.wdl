@@ -28,9 +28,6 @@ task prep_tables {
   
 
   command <<<
-
-    
-
     # download terra table
     python3 /scripts/export_large_tsv/export_large_tsv.py --project "~{terra_project_name}" --workspace "~{workspace_name}" --entity_type ~{table_name} --tsv_filename ~{table_name}-data.tsv
     
