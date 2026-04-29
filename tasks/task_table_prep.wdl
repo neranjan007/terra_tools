@@ -26,7 +26,7 @@ task prep_tables {
     String? filetype = "fastq"
   }
 
-  String timestamp = (date + "%Y%m%d_T%H%M%S")
+  String timestamp=(date + "%Y%m%d_T%H%M%S")
 
   command <<<
 
