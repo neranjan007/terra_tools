@@ -15,7 +15,7 @@ task prep_tables {
     String gcp_bucket_uri
     String submission_id_column_name
     String organism_column_name
-    String timestamp
+    # String timestamp
     String? library_strategy = "WGS"
     String? library_source = "GENOMIC"
     String? library_selection = "RANDOM"
@@ -24,10 +24,13 @@ task prep_tables {
     String? instrument_model = "MiSeq i100"
     String? design_description = "Paired-end 2x150 reads"
     String? filetype = "fastq"
-
-
   }
+
+
   command <<<
+
+    timestamp=$(date +"%Y%m%d_T%H%M%S")
+
     # download terra table
     python3 /scripts/export_large_tsv/export_large_tsv.py --project "~{terra_project_name}" --workspace "~{workspace_name}" --entity_type ~{table_name} --tsv_filename ~{table_name}-data.tsv
     
@@ -155,7 +158,7 @@ task prep_tables {
     # done < filepaths.tsv
     while IFS=$'\t' read -r filepath sample_name; do
       echo "running \`gsutil -m cp ${filepath} ~{gcp_bucket_uri}/\`" 
-      gsutil -m cp ${filepath} ~{gcp_bucket_uri} 
+      # gsutil -m cp ${filepath} ~{gcp_bucket_uri}
     done < filepaths_mapping.tsv
 
 

@@ -1,7 +1,7 @@
 version 1.0
 
 import "../tasks/task_table_prep.wdl" as prep
-import "../tasks/task_version.wdl" as version
+#import "../tasks/task_version.wdl" as version
 
 workflow sra_prep {
   input {
@@ -36,7 +36,7 @@ workflow sra_prep {
       sample_names = sample_names,
       bioproject = bioproject,
       gcp_bucket_uri = sra_transfer_gcp_bucket,
-      timestamp = version_capture.timestamp,
+      #timestamp = version_capture.timestamp,
       library_strategy = library_strategy,
       library_source = library_source,
       library_selection = library_selection,
@@ -54,6 +54,6 @@ workflow sra_prep {
     #File biosample_metadata = prep_tables.biosample_table
     File sra_metadata = prep_tables.sra_table
     File biosample_metadata = prep_tables.biosample_table
-    String sra_prep_version = "v0.8"
+    String sra_prep_version = "v0.1"
   }
 }
