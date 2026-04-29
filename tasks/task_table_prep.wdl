@@ -15,7 +15,6 @@ task prep_tables {
     String gcp_bucket_uri
     String submission_id_column_name
     String organism_column_name
-    # String timestamp
     String? library_strategy = "WGS"
     String? library_source = "GENOMIC"
     String? library_selection = "RANDOM"
