@@ -91,7 +91,7 @@ task prep_tables {
     onehealth["strain"] = onehealth["*sample_name"]
 
     ### Replace underscores with spaces, then keep only the first two words
-    ## onehealth["*organism"] = (onehealth["*organism"].str.replace("_", " ", regex=False).str.split(n=2).str[:2].str.join(" "))
+    onehealth["*organism"] = (onehealth["*organism"].str.replace("_", " ", regex=False).str.split(n=2).str[:2].str.join(" "))
 
     # prep sra_metadata
     sra_meta = pd.DataFrame(columns=["~{table_name}_id", "sample_name", "library_ID", "title", "library_strategy", "library_source", "library_selection", "library_layout", "platform", "instrument_model", "design_description", "filetype", "filename", "filename2"])
