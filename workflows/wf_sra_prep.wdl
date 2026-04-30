@@ -24,9 +24,7 @@ workflow sra_prep {
     String narms_project_name
   }
 
-  #call version.version_capture {
-  #  input:
-  #}
+
 
   call prep.prep_tables {
     input:
