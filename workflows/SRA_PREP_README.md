@@ -5,8 +5,7 @@
 The `sra_prep` workflow prepares standardized metadata tables for submitting sequencing data to the NCBI Sequence Read Archive (SRA). It takes sample information from a Terra workspace table and generates three metadata tables:
 
 1. **SRA Metadata Table** - Formatted for direct NCBI SRA submission
-2. **Microbe 1.0 Metadata Table** - NCBI Microbe 1.0 BioSample format
-3. **OneHealth Metadata Table** - One Health sample collection metadata format
+2. **OneHealth Metadata Table** - One Health sample collection metadata format
 
 This workflow is designed to work with the [Terra](https://terra.bio/) platform but can also be run locally with Cromwell.
 
@@ -74,13 +73,13 @@ This workflow is designed to work with the [Terra](https://terra.bio/) platform 
 |--------|------|-------------|
 | `sra_metadata` | File | SRA-formatted metadata table with timestamps |
 | `biosample_metadata` | File | OneHealth-formatted biosample metadata table |
-| `sra_prep_version` | String | Workflow version (v0.8) |
+
 
 ### Output File Naming
 Files are timestamped with format: `YYYYMMDDTHHMMSS`
 - `sra_meta_[timestamp].tsv` - SRA submission metadata
 - `onehealth_[timestamp].tsv` - OneHealth biosample metadata
-- `microbe_[timestamp].tsv` - Microbe 1.0 biosample metadata (internal)
+
 
 ## Running the Workflow
 
@@ -234,8 +233,7 @@ head onehealth_20240422T120000.tsv
 workflows/
 ├── wf_sra_prep.wdl          (Main workflow)
 └── tasks/
-    ├── task_table_prep.wdl   (Metadata preparation logic)
-    └── task_version.wdl      (Version/timestamp capture)
+    └── task_table_prep.wdl   (Metadata preparation logic)
 ```
 
 ## Docker Image
