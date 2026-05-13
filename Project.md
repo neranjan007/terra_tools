@@ -1,6 +1,4 @@
-# Terra Tools  
-
-[![Dockstore](https://img.shields.io/badge/Dockstore-Terra--Tools-blue)](https://dockstore.org/workflows/github.com/neranjan007/terra_tools/SRA_prep:main?tab=info)  
+# terra_tools
 
 A collection of WDL workflows and reusable tasks for bioinformatics data processing and metadata preparation on the [Terra](https://terra.bio/) platform. These workflows are designed for genomic sequencing data processing and NCBI submission preparation.
 
@@ -18,7 +16,7 @@ The `terra_tools` project provides production-ready WDL workflows for handling g
 ### For Terra Users
 
 1. **Import the Workflow**
-   - Go to [Dockstore](https://dockstore.org) and search for this repository or use this [link](https://dockstore.org/workflows/github.com/neranjan007/terra_tools/SRA_prep:main?tab=info) 
+   - Go to [Dockstore](https://dockstore.org) and search for this repository
    - Select "Import" to add workflows to your Terra workspace
 
 
@@ -54,7 +52,7 @@ terra_tools/
 
 ### Workflow Details
 
-#### `wf_sra_prep.wdl` - SRA Preparation Workflow for OneHealth Food Samples (NARMS)
+#### `wf_sra_prep.wdl` - SRA Preparation Workflow 
 Prepares standardized metadata tables for NCBI SRA submission. Takes sample information from a Terra workspace and generates three formatted metadata tables:
 - SRA submission format
 - OneHealth sample collection format
@@ -66,6 +64,8 @@ See [SRA_PREP_README.md](workflows/SRA_PREP_README.md) for comprehensive documen
 #### `task_table_prep.wdl`
 Core task for processing and formatting genomic sample metadata into standardized formats.
 
+#### `task_version.wdl`
+Captures version information and timestamps for workflow reproducibility.
 
 ## Dependencies & Requirements
 
@@ -169,12 +169,7 @@ This project is licensed under the **GNU General Public License v3.0** - see [LI
 
 - Built with [WDL](https://www.openwdl.org/) (Workflow Description Language)
 - Designed for [Terra](https://terra.bio/) platform
-- Supports [NCBI Sequence Read Archive](https://www.ncbi.nlm.nih.gov/sra/) submissions  
-
-
-## Contributors
-
-CT-DPH Bioinformatics
+- Supports [NCBI Sequence Read Archive](https://www.ncbi.nlm.nih.gov/sra/) submissions
 
 ---
 

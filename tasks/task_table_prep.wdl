@@ -4,13 +4,17 @@ task prep_tables {
   input {
     String table_name
     String workspace_name
-    String project_name
+    String terra_project_name
     Array[String] sample_names
     String bioproject
+    String CollectedBy
+    String SequencedBy
+    String narms_project_name 
+    String SequencedBy 
+    String CollectedBy 
     String gcp_bucket_uri
     String submission_id_column_name
     String organism_column_name
-    String timestamp
     String? library_strategy = "WGS"
     String? library_source = "GENOMIC"
     String? library_selection = "RANDOM"
@@ -19,12 +23,13 @@ task prep_tables {
     String? instrument_model = "MiSeq i100"
     String? design_description = "Paired-end 2x150 reads"
     String? filetype = "fastq"
-
-
   }
+
+  
+
   command <<<
     # download terra table
-    python3 /scripts/export_large_tsv/export_large_tsv.py --project "~{project_name}" --workspace "~{workspace_name}" --entity_type ~{table_name} --tsv_filename ~{table_name}-data.tsv
+    python3 /scripts/export_large_tsv/export_large_tsv.py --project "~{terra_project_name}" --workspace "~{workspace_name}" --entity_type ~{table_name} --tsv_filename ~{table_name}-data.tsv
     
     python3 <<CODE 
     import pandas as pd
@@ -37,11 +42,57 @@ task prep_tables {
     # selected samples only
     table = table[table["~{table_name}_id"].isin("~{sep='*' sample_names}".split("*"))]
 
-    # # prep Microbe 1.0
+    # # prep Onehealth biosample attributes 1.0
+    onehealth = pd.DataFrame(columns=["~{table_name}_id",\
+    "*sample_name",\
+    "bioproject_accession",\
+    "isolate_name_alias",\
+    "strain",\
+    "culture_collection",\
+    "reference_material",\
+    "*organism",\
+    "collected_by",\
+    "collection_date",\
+    "cult_isol_date",\
+    "geo_loc_name",\
+    "isolation_source",\
+    "source_type",\
+    "samp_collect_device",\
+    "purpose_of_sampling",\
+    "project_name",\
+    "IFSAC_category",\
+    "lat_lon",\
+    "serotype",\
+    "serovar",\
+    "sequenced_by",\
+    "description",\
+    "food_origin",\
+    "intended_consumer",\
+    "spec_intended_cons",\
+    "coll_site_geo_feat",\
+    "food_prod",\
+    "label_claims",\
+    "food_product_type",\
+    "food_industry_code",\
+    "food_industry_class",\
+    "food_source",\
+    "food_processing_method"])
+
+    onehealth["~{table_name}_id"] = table["~{table_name}_id"]
+    onehealth = onehealth.set_index("~{table_name}_id")
 
     table2 = table.set_index("~{table_name}_id")
-    table2 = table2.rename(columns={"~{submission_id_column_name}":"*sample_name","~{organism_column_name}":"*organism","collection_date":"*collection_date"})
+    table2 = table2.rename(columns={"~{submission_id_column_name}":"*sample_name","~{organism_column_name}":"*organism"})
    
+    onehealth.loc[:, ["*sample_name","*organism","collection_date","geo_loc_name","isolation_source","source_type","purpose_of_sampling","food_origin","label_claims"]] = table2[["*sample_name","*organism","collection_date","geo_loc_name","isolation_source","source_type","purpose_of_sampling","food_origin","label_claims"]]
+    
+    onehealth.fillna({"bioproject_accession":"~{bioproject}", "collected_by":"~{CollectedBy}", "project_name":"~{narms_project_name}", "sequenced_by":"~{SequencedBy}"}, inplace=True)
+    
+    onehealth["strain"] = onehealth["*sample_name"]
+
+    ### Replace underscores with spaces, then keep only the first two words
+    onehealth["*organism"] = (onehealth["*organism"].str.replace("_", " ", regex=False).str.split(n=2).str[:2].str.join(" "))
+
     # prep sra_metadata
     sra_meta = pd.DataFrame(columns=["~{table_name}_id", "sample_name", "library_ID", "title", "library_strategy", "library_source", "library_selection", "library_layout", "platform", "instrument_model", "design_description", "filetype", "filename", "filename2"])
     sra_meta["~{table_name}_id"] = table["~{table_name}_id"] 
@@ -58,24 +109,34 @@ task prep_tables {
                     "filetype":"~{filetype}"}, inplace=True)
 
     # generate a filepaths file for gsutil   
-    table["read1"].to_csv("filepaths.tsv", index=False, header=False)
-    table["read2"].to_csv("filepaths.tsv", mode='a', index=False, header=False)
+    mapping_data = pd.DataFrame()
+    mapping_data['filepath'] = pd.concat([table["read1"], table["read2"]], ignore_index=True)
+    mapping_data['sample_name'] = list(table2["sample_name"]) + list(table2["sample_name"])
+    mapping_data.to_csv("filepaths_mapping.tsv", sep='\t', index=False, header=False)
 
     # write tables into files
-    # 
-    sra_meta.to_csv("sra_meta_~{timestamp}.tsv", sep='\t', index=False)
-    
+    sra_meta.to_csv("sra_meta.tsv", sep='\t', index=False)
+    onehealth.to_csv("onehealth_biosample.tsv", sep='\t', index=False)
+
     CODE
     # iterate through file created earlier to grab the uri for each read file
-    while read -r line; do
-      echo "running \`gsutil -m cp ${line} ~{gcp_bucket_uri}\`"  
-    done < filepaths.tsv
+    # while read -r line; do
+    #   echo "running \`gsutil -m cp ${line} ~{gcp_bucket_uri}/${sample_name}\`"  
+    # done < filepaths.tsv
+    
+    while IFS=$'\t' read -r filepath sample_name; do
+      echo "running \`gsutil -m cp ${filepath} ~{gcp_bucket_uri}/\`" 
+      gsutil -m cp -n ${filepath} ~{gcp_bucket_uri}
+    done < filepaths_mapping.tsv
+
 
   >>>
 
   output {
 
-    File sra_table = "sra_meta_~{timestamp}.tsv"
+    File sra_table = "sra_meta.tsv"
+    File biosample_table = "onehealth_biosample.tsv"
+
   }
 
   runtime {
