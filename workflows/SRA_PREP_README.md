@@ -198,7 +198,7 @@ Create an `inputs.json` file:
 |--------|------|-------------|
 | `sra_metadata` | File | SRA-formatted metadata (timestamped TSV) |
 | `biosample_metadata` | File | OneHealth-formatted metadata (timestamped TSV) |
-| `sra_prep_version` | String | Workflow version |
+
 
 Files are timestamped with format: `YYYYMMDDTHHMMSS`
 
