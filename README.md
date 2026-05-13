@@ -1,4 +1,6 @@
-# terra_tools
+# Terra Tools  
+
+[![Dockstore](https://img.shields.io/badge/Dockstore-Terra--Tools-blue)](https://dockstore.org/workflows/github.com/neranjan007/terra_tools/SRA_prep:main?tab=info)  
 
 A collection of WDL workflows and reusable tasks for bioinformatics data processing and metadata preparation on the [Terra](https://terra.bio/) platform. These workflows are designed for genomic sequencing data processing and NCBI submission preparation.
 
@@ -16,7 +18,7 @@ The `terra_tools` project provides production-ready WDL workflows for handling g
 ### For Terra Users
 
 1. **Import the Workflow**
-   - Go to [Dockstore](https://dockstore.org) and search for this repository
+   - Go to [Dockstore](https://dockstore.org) and search for this repository or use this [link](https://dockstore.org/workflows/github.com/neranjan007/terra_tools/SRA_prep:main?tab=info) 
    - Select "Import" to add workflows to your Terra workspace
 
 
@@ -52,7 +54,7 @@ terra_tools/
 
 ### Workflow Details
 
-#### `wf_sra_prep.wdl` - SRA Preparation Workflow 
+#### `wf_sra_prep.wdl` - SRA Preparation Workflow for OneHealth Food Samples (NARMS)
 Prepares standardized metadata tables for NCBI SRA submission. Takes sample information from a Terra workspace and generates three formatted metadata tables:
 - SRA submission format
 - OneHealth sample collection format
