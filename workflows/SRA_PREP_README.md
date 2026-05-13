@@ -149,20 +149,68 @@ If running locally without Terra API access, you'll need to:
 
 ## Input Table Format
 
-The source table must contain the following columns:
-- **Sample ID** (`[table_name]_id`): Unique identifier for each sample
-- **Sample Name**: Human-readable sample identifier
-- **Organism**: Species/strain information
-- **Collection Date**: Date of sample collection
-- **Geo Location**: Geographic location of collection
-- **Isolation Source**: Source material (e.g., clinical specimen, environmental)
-- **Read1**: Path to first sequencing read file
-- **Read2**: Path to second sequencing read file (paired-end)
+### Required Parameters
+- `terra_project_name` - Your GCP project ID
+- `workspace_name` - Target Terra workspace name
+- `table_name` - Source data table name
+- `sample_names` - List of sample IDs to process
+- `sra_transfer_gcp_bucket` - GCS bucket for read files
+- `bioproject` - NCBI BioProject accession
+- `CollectedBy` - Organization that collected samples
+- `SequencedBy` - Organization that performed sequencing
+- `submission_id_column_name` - Sample ID name from the Terra table
 
-Optional columns (automatically mapped where available):
-- strain, serotype, serovar, MLST
-- collection metadata fields
+### Optional Parameters
+- `library_strategy` (default: "WGS")
+- `library_source` (default: "GENOMIC")
+- `library_selection` (default: "RANDOM")
+- `library_layout` (default: "paired")
+- `platform` (default: "ILLUMINA")
+- `instrument_model` (default: "MiSeq i100")
+- `design_description` (default: "Paired-end 2x150 reads")
 - food origin, food product type (for foodborne pathogen data)
+
+
+## Sample Input
+
+Create an `inputs.json` file:
+```json
+{
+  "sra_prep.terra_project_name": "my-gcp-project",
+  "sra_prep.workspace_name": "my-workspace",
+  "sra_prep.table_name": "samples",
+  "sra_prep.sample_names": ["SAM001", "SAM002", "SAM003"],
+  "sra_prep.sra_transfer_gcp_bucket": "gs://my-bucket/sra-reads/",
+  "sra_prep.bioproject": "PRJNA123456",
+  "sra_prep.CollectedBy": "Organization that collected samples",
+  "sra_prep.SequencedBy": "Organization that collected samples",
+  "sra_prep.narms_project_name": "NARMS_2024",
+  "sra_prep.library_strategy": "WGS",
+  "sra_prep.platform": "ILLUMINA",
+  "sra_prep.instrument_model": "MiSeq"
+}
+```
+
+
+## Outputs
+
+| Output | Type | Description |
+|--------|------|-------------|
+| `sra_metadata` | File | SRA-formatted metadata (timestamped TSV) |
+| `biosample_metadata` | File | OneHealth-formatted metadata (timestamped TSV) |
+| `sra_prep_version` | String | Workflow version |
+
+Files are timestamped with format: `YYYYMMDDTHHMMSS`
+
+## Usage Examples
+
+
+### Example: Terra Execution
+1. Import `wf_sra_prep.wdl` to Terra workspace using the [link](https://dockstore.org/workflows/github.com/neranjan007/terra_tools/SRA_prep:main?tab=info)
+2. Create new workflow in workspace
+3. Configure inputs with your sample data
+4. Launch through Terra 
+
 
 ## Example Workflow
 
@@ -227,7 +275,7 @@ The workflow uses a custom Docker image with Terra tools:
 
 ## Version History
 
-- **v0.8** - Current version
+- **v0.1** - Current version
   - Multiple metadata format support
   - GCP integration for file management
   - Terra workspace integration

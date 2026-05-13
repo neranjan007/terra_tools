@@ -8,7 +8,7 @@ The `terra_tools` project provides production-ready WDL workflows for handling g
 
 - **NCBI SRA Metadata Preparation** - Standardized formatting for Sequence Read Archive submissions
 - **Modular Task Design** - Reusable WDL task components for common bioinformatics operations
-- **Terra Platform Integration** - Built for seamless execution on Terra 
+- **Terra Platform Integration** - Built for seamless execution on Terra with optional local Cromwell support
 - **Reproducibility** - Version tracking and timestamped outputs for audit trails
 
 ## Quick Start
@@ -32,24 +32,38 @@ The `terra_tools` project provides production-ready WDL workflows for handling g
 
 
 
+## Project Structure
 
+```
+terra_tools/
+├── README.md                          # This file
+├── LICENSE                            # GNU General Public License v3
+├── .dockstore.yml                     # Dockstore configuration
+├── empty.json                         # Empty test parameters
+│
+├── workflows/
+│   ├── wf_sra_prep.wdl               # SRA metadata preparation workflow
+│   └── SRA_PREP_README.md            # Detailed SRA workflow documentation
+│
+└── tasks/
+    └──task_table_prep.wdl           # Core table preparation task
+
+```
 
 ### Workflow Details
 
-#### `wf_sra_prep.wdl` - SRA Preparation Workflow
+#### `wf_sra_prep.wdl` - SRA Preparation Workflow 
 Prepares standardized metadata tables for NCBI SRA submission. Takes sample information from a Terra workspace and generates three formatted metadata tables:
 - SRA submission format
-- OneHealth Biosample collection format
+- OneHealth sample collection format
 
-See [SRA_PREP_README.md](workflows/SRA_PREP_README.md) for comprehensive documentation.
+See [SRA_PREP_README.md](workflows/SRA_PREP_README.md) for comprehensive documentation. git/ctdph/terra_tools/workflows/SRA_PREP_README.md
 
 ### Task Details
 
 #### `task_table_prep.wdl`
 Core task for processing and formatting genomic sample metadata into standardized formats.
 
-#### `task_version.wdl`
-Captures version information and timestamps for workflow reproducibility.
 
 ## Dependencies & Requirements
 
@@ -114,48 +128,29 @@ Create an `inputs.json` file:
 |--------|------|-------------|
 | `sra_metadata` | File | SRA-formatted metadata (timestamped TSV) |
 | `biosample_metadata` | File | OneHealth-formatted metadata (timestamped TSV) |
-| `sra_prep_version` | String | Workflow version |
 
 Files are timestamped with format: `YYYYMMDDTHHMMSS`
 
 ## Usage Examples
 
+### Example 1: Local Execution with Cromwell
+```bash
+cd /path/to/terra_tools
+java -jar cromwell-85.jar run workflows/wf_sra_prep.wdl -i my_inputs.json
+```
 
-### Example: Terra Execution
-1. Import `wf_sra_prep.wdl` to Terra workspace using the [link](https://dockstore.org/workflows/github.com/neranjan007/terra_tools/SRA_prep:main?tab=info)
+### Example 2: Terra Execution
+1. Upload `wf_sra_prep.wdl` to Terra Method Repository
 2. Create new workflow in workspace
 3. Configure inputs with your sample data
-4. Launch through Terra 
+4. Click "Run workflow"
+
+### Example 3: Dockstore
+1. Visit https://dockstore.org
+2. Search for "terra_tools"
+3. Launch through Terra or local Cromwell
 
 
-## Contributing Guidelines
-
-We welcome contributions! Please follow these guidelines:
-
-### Code Style
-- Follow WDL best practices from [OpenWDL.org](https://www.openwdl.org/)
-- Use meaningful variable and task names
-- Add comments for complex logic
-- Keep tasks modular and reusable
-
-### Testing
-- Test workflows locally with Cromwell before submission
-- Use test inputs (`empty.json` as template)
-- Verify outputs match expected formats
-- Test with both small and large sample sets
-
-### Documentation
-- Update relevant README files
-- Document new inputs/outputs
-- Provide usage examples
-- Include version numbers in commit messages
-
-### Submitting Changes
-1. Create a feature branch
-2. Make your changes
-3. Test thoroughly
-4. Submit a pull request with clear description
-5. Ensure CI/CD checks pass
 
 ## Support & Contact
 
@@ -172,9 +167,14 @@ This project is licensed under the **GNU General Public License v3.0** - see [LI
 
 - Built with [WDL](https://www.openwdl.org/) (Workflow Description Language)
 - Designed for [Terra](https://terra.bio/) platform
-- Supports [NCBI Sequence Read Archive](https://www.ncbi.nlm.nih.gov/sra/) submissions
+- Supports [NCBI Sequence Read Archive](https://www.ncbi.nlm.nih.gov/sra/) submissions  
+
+
+## Contributors
+
+CT-DPH Bioinformatics
 
 ---
 
-**Last Updated**: April 2026
+**Last Updated**: May 2026
 **Current Version**: v0.1

@@ -46,19 +46,18 @@ terra_tools/
 │   └── SRA_PREP_README.md            # Detailed SRA workflow documentation
 │
 └── tasks/
-    ├── task_table_prep.wdl           # Core table preparation task
-    └── task_version.wdl              # Version capture task
+    └──task_table_prep.wdl           # Core table preparation task
+
 ```
 
 ### Workflow Details
 
-#### `wf_sra_prep.wdl` - SRA Preparation Workflow
+#### `wf_sra_prep.wdl` - SRA Preparation Workflow 
 Prepares standardized metadata tables for NCBI SRA submission. Takes sample information from a Terra workspace and generates three formatted metadata tables:
 - SRA submission format
-- NCBI Microbe 1.0 BioSample format  
 - OneHealth sample collection format
 
-See [SRA_PREP_README.md](workflows/SRA_PREP_README.md) for comprehensive documentation.
+See [SRA_PREP_README.md](workflows/SRA_PREP_README.md) for comprehensive documentation. git/ctdph/terra_tools/workflows/SRA_PREP_README.md
 
 ### Task Details
 
@@ -131,7 +130,6 @@ Create an `inputs.json` file:
 |--------|------|-------------|
 | `sra_metadata` | File | SRA-formatted metadata (timestamped TSV) |
 | `biosample_metadata` | File | OneHealth-formatted metadata (timestamped TSV) |
-| `sra_prep_version` | String | Workflow version |
 
 Files are timestamped with format: `YYYYMMDDTHHMMSS`
 
@@ -154,34 +152,7 @@ java -jar cromwell-85.jar run workflows/wf_sra_prep.wdl -i my_inputs.json
 2. Search for "terra_tools"
 3. Launch through Terra or local Cromwell
 
-## Contributing Guidelines
 
-We welcome contributions! Please follow these guidelines:
-
-### Code Style
-- Follow WDL best practices from [OpenWDL.org](https://www.openwdl.org/)
-- Use meaningful variable and task names
-- Add comments for complex logic
-- Keep tasks modular and reusable
-
-### Testing
-- Test workflows locally with Cromwell before submission
-- Use test inputs (`empty.json` as template)
-- Verify outputs match expected formats
-- Test with both small and large sample sets
-
-### Documentation
-- Update relevant README files
-- Document new inputs/outputs
-- Provide usage examples
-- Include version numbers in commit messages
-
-### Submitting Changes
-1. Create a feature branch
-2. Make your changes
-3. Test thoroughly
-4. Submit a pull request with clear description
-5. Ensure CI/CD checks pass
 
 ## Support & Contact
 
@@ -202,5 +173,5 @@ This project is licensed under the **GNU General Public License v3.0** - see [LI
 
 ---
 
-**Last Updated**: April 2026
-**Current Version**: v0.8
+**Last Updated**: May 2026
+**Current Version**: v0.1
